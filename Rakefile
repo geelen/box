@@ -22,7 +22,7 @@ def run cmd, desc, *colours
 end
 
 def files
-  Dir[File.join($working_dir, "content", "**", "*")]
+  Dir[File.join($working_dir, "content", "**", "*.markdown")]
 end
 
 def filenames
@@ -99,4 +99,9 @@ task :lol do
   puts "files = #{files.inspect}"
   puts "filenames = #{filenames.inspect}"
   puts "html_files = #{html_files.inspect}"
+end
+
+desc "List tracked markdown files in order"
+task :list do
+  puts files
 end
