@@ -2,6 +2,10 @@ require "rubygems"
 require "term/ansicolor"
 include Term::ANSIColor
 
+$command_line_options = Hash[*ENV.keys.grep(/^with_(.+)/) { |param| [$1.to_sym,ENV[param]] }.flatten]
+
+$working_dir = $command_line_options[:dir] || Dir.pwd
+
 def run cmd, desc, *colours
   print bold, blue, "#{desc}:", reset, "\n"
   colours.each { |c| print c }
@@ -17,8 +21,16 @@ def run cmd, desc, *colours
   puts reset
 end
 
-def files ext = ""
-  %w[main scalpel].map { |f| f + ext }
+def files
+  Dir[File.join($working_dir, "content", "**", "*")]
+end
+
+def filenames
+  files.map { |f| File.basename(f, ".*") }
+end
+
+def html_files
+  filenames.map { |f| File.join($working_dir, "out", "html", f + ".html") }
 end
 
 def pandoc file
@@ -54,17 +66,17 @@ def pandoc file
   }
 end
 
-files.each { |f|
-  file "#{f}.html" => ["markdown-example/#{f}.markdown"] do
+html_files.each { |f|
+  file f => ["markdown-example/#{f}.markdown"] do
     pandoc(f)
   end
 }
 
 desc "Recompile the markdown to html"
-task :markdown => files('.html')
+task :markdown => html_files
 
 desc "Grab the html files and pdf-ize them through safari"
-task :html_to_pdf => files('.html') do
+task :html_to_pdf => html_files do
   require 'rbosa' 
   run "rm ~/Desktop/cups-pdf/*", "Cleaning ~/Desktop/cups-pdf"
   app = OSA.app('Safari')
@@ -80,6 +92,11 @@ task :html_to_pdf => files('.html') do
   }
 end
 
+desc "for testing"
 task :lol do
-  puts Dir["./*"]
+  puts "$working_dir = #{$working_dir.inspect}"
+  puts "Dir[File.join($working_dir, '*')] = #{Dir[File.join($working_dir, '*')].inspect}"
+  puts "files = #{files.inspect}"
+  puts "filenames = #{filenames.inspect}"
+  puts "html_files = #{html_files.inspect}"
 end
