@@ -1,16 +1,31 @@
 describe "Html Generation" do
-  before do
+  before(:all) do
     @path = "examples/one"
     @outpath = File.join(@path, "out")
-    File.exists?(@outpath).should == false
+    @outhtmlpath = File.join(@outpath, "html")
+    `cd examples/one && rake -f ~/src/box/box.rb`
   end
   
-  after do
+  after(:all) do
     FileUtils::rm_rf(@outpath)
   end
   
-  it "should generate one file per page, in matching dir structure" do
-    `cd examples/one && rake -f ~/src/box/box.rb`
+  it "should have created the output path" do
     File.exists?(@outpath).should == true
+  end
+  
+  it "should generate an all.html" do  
+    File.exists?(File.join(@outhtmlpath, 'all.html')).should == true
+  end
+  
+  it "should make one output for every output" do
+    Dir[File.join(@path, 'content','**','*')].each { |input|
+      outpath = input.gsub(@path, @outhtmlpath).gsub(/.markdown$/,'.html')
+      File.exists?(outpath).should == true
+    }
+  end
+  
+  it "should copy across the assets" do
+    Dir[File.join(@outpath,'assets','**','*')].map { |f| f.gsub(@outpath,'') }.should == Dir[File.join(@path, 'assets','**','*')].map { |f| f.gsub(@path,'') }
   end
 end

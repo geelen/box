@@ -1,10 +1,21 @@
+
+#todo: needs fix. Temp files are pretty nasty!
+def do_all
+  require 'Tempfile'
+  tfile = Tempfile.new('all.markdown')
+  `cat #{html_files.join(' ')} > #{tfile.path}`
+  pandoc(tfile.path, File.join($working_dir, 'out', 'html' , 'all.html'))
+  tfile.delete
+end
+
+def do_assets
+  run("rsync -ralP #{$working_dir}/assets  #{$working_dir}/out/", "Rsyncing assets")
+end
+
 desc "Recompile the markdown to html"
 task :default => html_files do
-  #todo: needs fix!!
-  all = "#{$working_dir}/out/html/all"
-  `cat #{html_files.join(' ')} > #{all}.markdown`
-  pandoc("#{all}.markdown", "#{all}.html")
-  FileUtils::rm "#{all}.markdown"
+  do_all
+  do_assets
 end
 
 desc "for testing"

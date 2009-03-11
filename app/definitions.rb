@@ -30,7 +30,7 @@ def filenames
 end
 
 def html_files
-  files.map { |f| File.join($working_dir, "out", "html", f.split('content').last.gsub(/\.markdown$/,'.html')) }
+  files.map { |f| f.gsub($working_dir,File.join($working_dir, 'out', 'html')).gsub(/\.markdown$/,'.html') }
 end
 
 files.zip(html_files).each { |m,h|
