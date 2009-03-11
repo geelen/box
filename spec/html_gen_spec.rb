@@ -10,7 +10,7 @@ describe "Html Generation" do
   end
   
   it "should generate one file per page, in matching dir structure" do
-    # `cd examples/one && rake -f ~/src/box/box.rb`
-    # File.exists?(@outpath).should == true
+    `cd examples/one && rake -f ~/src/box/box.rb`
+    File.exists?(@outpath).should == true
   end
 end

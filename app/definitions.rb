@@ -30,11 +30,11 @@ def filenames
 end
 
 def html_files
-  filenames.map { |f| File.join($working_dir, "out", "html", f + ".html") }
+  files.map { |f| File.join($working_dir, "out", "html", f.split('content').last.gsub(/\.markdown$/,'.html')) }
 end
 
-html_files.each { |f|
-  file f => ["markdown-example/#{f}.markdown"] do
-    pandoc(f)
+files.zip(html_files).each { |m,h|
+  file h => [m] do
+    pandoc(m,h)
   end
 }
