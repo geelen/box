@@ -30,7 +30,7 @@ def filenames
 end
 
 def html_files
-  files.map { |f| f.gsub($working_dir,File.join($working_dir, 'out', 'html')).gsub(/\.markdown$/,'.html') }
+  files.map { |f| File.join($working_dir, 'out', 'html', f.gsub(content_dir + '/','').gsub(/\//,'_').gsub(/\.markdown$/,'.html')) }
 end
 
 def content_dir

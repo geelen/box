@@ -23,9 +23,10 @@ describe "Html Generation" do
   end
   
   it "should make one output for every output" do
-    Dir[File.join(@path, 'content','**','*.markdown')].each { |input|
+    content_path = File.join(@path, 'content')
+    Dir[File.join(content_path,'**','*.markdown')].each { |input|
       next if input =~ /!intro.markdown$/
-      outpath = input.gsub(@path, @outhtmlpath).gsub(/.markdown$/,'.html')
+      outpath = File.join(@outhtmlpath, input.gsub(content_path + '/','').gsub(/\//,'_').gsub(/\.markdown$/,'.html'))  
       File.exists?(outpath).should == true
     }
   end
