@@ -1,6 +1,20 @@
 require 'Tempfile'
 require 'hpricot'
 
+def gen_html
+  files.zip(html_files).each_with_index { |(m,h),i|
+    tfile = Tempfile.new(File.basename(m))
+    tfile.puts File.read(m), "", "---", ""
+    tfile.print "[Prev](#{File.basename(html_files[i-1])}) - " if i != 0
+    tfile.print "[Home](index.html)"
+    tfile.print " - [Next](#{File.basename(html_files[i+1])})" if i != html_files.length - 1
+    tfile.puts ""
+    tfile.close
+#    puts File.read(tfile.path)
+    pandoc(tfile.path, h)
+  }
+end
+
 def hack_html
   html_files.each { |f|
     doc = Hpricot(File.read(f))
@@ -27,10 +41,11 @@ def do_index
   html_files.each { |f|
     doc = Hpricot(File.read(f))
     (doc/'.header').each { |h|
-      tfile.puts "#{'  ' * (h.name[1..-1].to_i - 1)}1. [#{h.inner_text}](#{File.basename(f)}##{h['id']})", ""
+      tfile.puts "#{"\t" * (h.name[1..-1].to_i - 1)}1. [#{h.inner_text}](#{File.basename(f)}##{h['id']})"
     }
   }
   tfile.close
+#  puts File.read(tfile.path)
   pandoc(tfile.path, File.join($working_dir, 'out', 'html', 'index.html'))
 end
 
@@ -39,9 +54,11 @@ def do_assets
 end
 
 desc "Recompile the markdown to html"
-task :default => html_files do
+#task :default => html_files do
+task :default do
   raise "Directory doesn't exist!" if !File.exists? $working_dir
   raise "No files to process!" if files.empty?
+  gen_html
   hack_html
   do_all
   do_index
