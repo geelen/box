@@ -22,7 +22,7 @@ def run cmd, desc, *colours
 end
 
 def files
-  Dir[File.join($working_dir, "content", "**", "*.markdown")]
+  Dir[File.join(content_dir, "**", "*.markdown")].delete_if { |f| f =~ /!intro.markdown$/ }
 end
 
 def filenames
@@ -31,6 +31,22 @@ end
 
 def html_files
   files.map { |f| f.gsub($working_dir,File.join($working_dir, 'out', 'html')).gsub(/\.markdown$/,'.html') }
+end
+
+def content_dir
+  File.join($working_dir, "content")
+end
+
+def intro_file
+  File.join(content_dir, '!intro.markdown')
+end
+
+def header_file
+  File.join(content_dir, '!header.html')
+end
+
+def footer_file
+  File.join(content_dir, '!footer.html')
 end
 
 files.zip(html_files).each { |m,h|

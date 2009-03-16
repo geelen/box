@@ -10,6 +10,10 @@ def do_all
   tfile.delete
 end
 
+def do_index
+  pandoc(intro_file, File.join($working_dir, 'out', 'html' , 'index.html'))
+end
+
 def do_assets
   run("rsync -ralP --exclude=*.svn* --delete #{$working_dir}/assets #{$working_dir}/out/html", "Rsyncing assets")
 end
@@ -17,9 +21,9 @@ end
 desc "Recompile the markdown to html"
 task :default => html_files do
   raise "Directory doesn't exist!" if !File.exists? $working_dir
-  print bold, blue, "Running BOX in #{$working_dir}:", reset, "\n"
   raise "No files to process!" if files.empty?
   do_all
+  do_index
   do_assets
 end
 

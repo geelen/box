@@ -3,7 +3,7 @@ def get_files cmd
 end
 
 def expected_files
-    %w[!intro.markdown a/somefile.markdown a.markdown b/anotherfile.markdown z.markdown]
+    %w[a/somefile.markdown a.markdown b/anotherfile.markdown z.markdown]
 end
 
 describe "Listing" do
