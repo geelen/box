@@ -1,3 +1,7 @@
+def list_files path
+  Dir[File.join(path,'**','*')].map { |f| f.gsub(path,'') }
+end
+
 describe "Html Generation" do
   before(:all) do
     @path = "examples/one"
@@ -26,6 +30,6 @@ describe "Html Generation" do
   end
   
   it "should copy across the assets" do
-    Dir[File.join(@outpath,'assets','**','*')].map { |f| f.gsub(@outpath,'') }.should == Dir[File.join(@path, 'assets','**','*')].map { |f| f.gsub(@path,'') }
+    list_files(File.join(@outpath,'assets')).should == list_files(File.join(@path, 'assets'))
   end
 end
