@@ -1,22 +1,24 @@
-
 #todo: needs fix. Temp files are pretty nasty!
 def do_all
   require 'Tempfile'
   tfile = Tempfile.new('all.markdown')
-  `cat #{html_files.join(' ')} > #{tfile.path}`
+  files.each { |f| 
+    `cat #{f} >> #{tfile.path}`
+    `echo "\n" >> #{tfile.path}`
+  }
   pandoc(tfile.path, File.join($working_dir, 'out', 'html' , 'all.html'))
   tfile.delete
 end
 
 def do_assets
-  run("rsync -ralP #{$working_dir}/assets  #{$working_dir}/out/", "Rsyncing assets")
+  run("rsync -ralP --exclude=*.svn* --delete #{$working_dir}/assets #{$working_dir}/out/html", "Rsyncing assets")
 end
 
 desc "Recompile the markdown to html"
 task :default => html_files do
   raise "Directory doesn't exist!" if !File.exists? $working_dir
   print bold, blue, "Running BOX in #{$working_dir}:", reset, "\n"
-  raise "No files to process!" if html_files.empty?
+  raise "No files to process!" if files.empty?
   do_all
   do_assets
 end
