@@ -46,7 +46,7 @@ def do_index
   html_files.each { |f|
     doc = Hpricot(File.read(f))
     (doc/'.header').each { |h|
-      tfile.puts "#{"\t" * (h.name[1..-1].to_i - 1)}1. [#{h.inner_text}](#{File.basename(f)}##{h['id']})"
+      tfile.puts "#{"  " * (h.name[1..-1].to_i - 1)}1. [#{h.inner_text}](#{File.basename(f)}##{h['id']})"
     }
   }
   tfile.close
