@@ -16,10 +16,15 @@ def gen_html
 end
 
 def hack_html
-  html_files.each { |f|
+  id_files = {}
+  html_file_doc = html_files.map { |f|
     doc = Hpricot(File.read(f))
     (doc/:code).each { |c| c['class'] = c.classes.push('brush: java').join(' ') }
-    %w[h1 h2 h3 h4 h5].each { |e| (doc/e).each { |e2| e2['class'] = e2.classes.push('header').join(' ') } }
+    %w[h1 h2 h3 h4 h5].each { |e| (doc/e).each { |e2| e2['class'] = e2.classes.push('header').join(' '); id_files[e2['id']] = f } }
+    [f, doc]
+  }
+  html_file_doc.each { |f, doc|
+    (doc/'a[@href^="#"]').each { |a| id = a['href'][1..-1]; a['href'] = (id_files[id] or '') +  '#' + id }
     File.open(f,'w') { |out| out.puts doc }
   }
 end
