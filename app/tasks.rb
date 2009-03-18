@@ -46,11 +46,12 @@ def do_index
   html_files.each { |f|
     doc = Hpricot(File.read(f))
     (doc/'.header').each { |h|
-      tfile.puts "#{"  " * (h.name[1..-1].to_i - 1)}1. [#{h.inner_text}](#{File.basename(f)}##{h['id']})"
+      i = h.name[1..-1].to_i
+      tfile.puts "#{"  " * (i-1)}1.  [#{h.inner_text}](#{File.basename(f)}##{h['id']})"
     }
   }
   tfile.close
- puts File.read(tfile.path)
+  #puts File.read(tfile.path)
   maruku(tfile.path, File.join($working_dir, 'out', 'html', 'index.html'))
 end
 
