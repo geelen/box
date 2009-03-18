@@ -11,7 +11,7 @@ def gen_html
     tfile.puts ""
     tfile.close
 #    puts File.read(tfile.path)
-    pandoc(tfile.path, h)
+    maruku(tfile.path, h)
   }
 end
 
@@ -36,7 +36,7 @@ def do_all
     tfile.puts File.read(f), ""
   }
   tfile.close
-  pandoc(tfile.path, File.join($working_dir, 'out', 'html', 'all.html'))
+  maruku(tfile.path, File.join($working_dir, 'out', 'html', 'all.html'))
   tfile.delete
 end
 
@@ -50,8 +50,8 @@ def do_index
     }
   }
   tfile.close
-#  puts File.read(tfile.path)
-  pandoc(tfile.path, File.join($working_dir, 'out', 'html', 'index.html'))
+ puts File.read(tfile.path)
+  maruku(tfile.path, File.join($working_dir, 'out', 'html', 'index.html'))
 end
 
 def do_assets
