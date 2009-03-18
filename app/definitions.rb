@@ -49,6 +49,14 @@ def footer_file
   File.join(content_dir, '!footer.html')
 end
 
+def out_html_dir
+  File.join($working_dir, 'out', 'html')
+end
+
+def all_file
+  File.join(out_html_dir, 'all.html')
+end
+
 #files.zip(html_files).each { |m,h|
 #  file h => [m] do
 #    pandoc(m,h)

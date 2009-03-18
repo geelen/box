@@ -15,11 +15,15 @@ def gen_html
   }
 end
 
+def add_brush doc
+  (doc/:code).each { |c| c['class'] = c.classes.push('brush: java').join(' ') }
+end
+
 def hack_html
   id_files = {}
   html_file_doc = html_files.map { |f|
     doc = Hpricot(File.read(f))
-    (doc/:code).each { |c| c['class'] = c.classes.push('brush: java').join(' ') }
+    add_brush(doc)
     %w[h1 h2 h3 h4 h5].each { |e| (doc/e).each { |e2| e2['class'] = e2.classes.push('header').join(' '); id_files[e2['id']] = f } }
     [f, doc]
   }
@@ -29,30 +33,48 @@ def hack_html
   }
 end
 
+def headers
+  html_files.each { |f|
+    doc = Hpricot(File.read(f))
+    (doc/'.header').each { |h|
+      i = h.name[1..-1].to_i
+      yield f,h,i
+    }
+  }
+end
+
 #todo: needs fix. Temp files are pretty nasty!
 def do_all
   tfile = Tempfile.new('all.markdown')
+  tfile.puts File.read(intro_file), "", "---", ""
+  headers { |f,h,i|
+    tfile.puts "#{"  " * (i-1)}1.  [#{h.inner_text}](##{h['id']})"
+  }
+  tfile.puts "", "---", ""
   files.each { |f| 
     tfile.puts File.read(f), ""
   }
   tfile.close
-  maruku(tfile.path, File.join($working_dir, 'out', 'html', 'all.html'))
+  maruku(tfile.path, all_file)
   tfile.delete
+  all = File.read(all_file)
+  File.open(all_file,'w') { |out|
+    doc = Hpricot(all)
+    add_brush(doc)
+    out.puts doc
+  }
 end
 
 def do_index
   tfile = Tempfile.new('index.markdown')
   tfile.puts File.read(intro_file), "", "---", ""
-  html_files.each { |f|
-    doc = Hpricot(File.read(f))
-    (doc/'.header').each { |h|
-      i = h.name[1..-1].to_i
-      tfile.puts "#{"  " * (i-1)}1.  [#{h.inner_text}](#{File.basename(f)}##{h['id']})"
-    }
+  headers { |f,h,i|
+    tfile.puts "#{"  " * (i-1)}1.  [#{h.inner_text}](#{File.basename(f)}##{h['id']})"
   }
   tfile.close
   #puts File.read(tfile.path)
   maruku(tfile.path, File.join($working_dir, 'out', 'html', 'index.html'))
+  tfile.delete
 end
 
 def do_assets
@@ -66,8 +88,8 @@ task :default do
   raise "No files to process!" if files.empty?
   gen_html
   hack_html
-  do_all
   do_index
+  do_all
   do_assets
 end
 
